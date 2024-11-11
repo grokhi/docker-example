@@ -1,0 +1,68 @@
+# Healthchecks configurations to reuse across different stages of the project
+# -----------------------------------------------------------------------------
+
+
+services:
+
+  # DJANGO ---------------------------------------------------------------------
+  django:
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -k -f $$ASGI_PROTO://0.0.0.0:$$ASGI_PORT/api/v0/ping" ]
+      interval: ${DJANGO_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${DJANGO_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${DJANGO_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${DJANGO_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+  celeryworker:
+    healthcheck:
+      test: [ "CMD-SHELL", "/check-celeryworker" ]
+      interval: ${CELERYWORKER_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${CELERYWORKER_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${CELERYWORKER_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${CELERYWORKER_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+  celerybeat:
+    healthcheck:
+      test: [ "CMD-SHELL", "/check-celerybeat" ]
+      interval: ${CELERYBEAT_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${CELERYBEAT_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${CELERYBEAT_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${CELERYBEAT_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+  celeryflower:
+    healthcheck:
+      test: [ "CMD-SHELL", "/check-celeryflower" ]
+      interval: ${CELERYFLOWER_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${CELERYFLOWER_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${CELERYFLOWER_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${CELERYFLOWER_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres:
+    healthcheck:
+      test: pg_isready
+      interval: ${POSTGRES_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${POSTGRES_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${POSTGRES_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${POSTGRES_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo:
+    healthcheck:
+      test: [ "CMD-SHELL", "/check-mongo" ]
+      interval: ${MONGO_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${MONGO_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${MONGO_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${MONGO_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+
+  # REDIS ---------------------------------------------------------------------
+  redis:
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: ${REDIS_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${REDIS_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${REDIS_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${REDIS_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}

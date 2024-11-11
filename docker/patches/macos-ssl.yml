@@ -1,0 +1,11 @@
+# change the path to the location of your ssl certificates for macOS
+# -----------------------------------------------------------------------------
+
+
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django:
+    volumes:
+      - /etc/letsencrypt/live/main.hello5.pro/fullchain.pem:/etc/ssl/fullchain.pem:ro
+      - /etc/letsencrypt/live/main.hello5.pro/privkey.pem:/etc/ssl/privkey.pem:ro

@@ -1,0 +1,61 @@
+# PgAdmin for monitoring and debugging Postgres service
+# -----------------------------------------------------------------------------
+secrets:
+
+  pgadmin-password:
+    file: ${SECRETS_DIR}/.pgadmin-password
+
+
+services:
+
+  # PGADMIN -------------------------------------------------------------------
+  pgadmin:
+
+    image: ${PROJECT_NAME}-${PGADMIN_IMAGE_NAME:-${PGADMIN_HOST_NAME:-pgadmin}}:${PGADMIN_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${PGADMIN_HOST_NAME:-pgadmin}
+    hostname: ${PROJECT_NAME}-${PGADMIN_HOST_NAME:-pgadmin}
+    restart: ${PGADMIN_RESTART:-${FB_RESTART:-no}}
+
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/pgadmin.Dockerfile
+      args:
+        IMAGE_NAME: ${PGADMIN_BASE_IMAGE_NAME}
+        IMAGE_TAG: ${PGADMIN_BASE_IMAGE_TAG}
+        IMAGE_USER_NAME: ${PGADMIN_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${PGADMIN_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${PGADMIN_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${PGADMIN_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+
+    env_file:
+      - ${ENV_FILES_DIR}/.pgadmin
+    environment:
+      CONTAINER_NAME: ${PROJECT_NAME}-${PGADMIN_SERVICE_NAME:-pgadmin}
+      PGADMIN_DEFAULT_PASSWORD_FILE: /run/secrets/pgadmin-password
+    secrets:
+      - pgadmin-password
+
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://0.0.0.0:80/misc/ping" ]
+      interval: ${PGADMIN_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${PGADMIN_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${PGADMIN_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${PGADMIN_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+    privileged: false
+#    read_only: true
+#    tmpfs:
+#      - /pgadmin4
+#      - /etc
+#      - /var
+#      - /tmp
+    cpu_count: "1"
+    mem_reservation: "256m"
+    mem_limit: "512m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=false"
+
+    networks:
+      - personal-account

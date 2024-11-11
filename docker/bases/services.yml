@@ -1,0 +1,89 @@
+# Base services to reuse in concrete stages of the project are defined here
+# -----------------------------------------------------------------------------
+# HOW TO USE:             https://docs.docker.com/reference/compose-file/merge/
+# - define base images, start commands, service names, restarts, configs,
+#   envs and secrets and other abstract definitions here
+# - define ports here only if they are the same for all stages and are deeply
+#   intertwined with service's config, otherwise define them in concrete stages;
+#   in any case it's better to define them in concrete stages to be explicit
+# -----------------------------------------------------------------------------
+# NB!:
+# - lists defined by square brackets syntax are overridden in latest compose
+#   files, while lists defined by dash syntax are merged from all compose files
+# - attributes (command, entrypoint and healthcheck: test) are overridden by
+#   the latest compose file, and not appended
+# -----------------------------------------------------------------------------
+
+
+name: ${PROJECT_NAME:-personal-account}-${STAGE_NAME:-default}
+
+
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django: &django
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/django.dev.Dockerfile
+    image: ${PROJECT_NAME}-${DJANGO_IMAGE_NAME:-${DJANGO_HOST_NAME:-django}}:${DJANGO_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${DJANGO_HOST_NAME:-django}
+    hostname: ${PROJECT_NAME}-${DJANGO_HOST_NAME:-django}
+    restart: ${DJANGO_RESTART:-${FB_RESTART:-no}}
+    command: /start
+
+  celeryworker:
+    <<: *django
+    image: ${PROJECT_NAME}-${CELERYWORKER_IMAGE_NAME:-${CELERYWORKER_HOST_NAME:-worker}}:${CELERYWORKER_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${CELERYWORKER_HOST_NAME:-worker}
+    hostname: ${PROJECT_NAME}-${CELERYWORKER_HOST_NAME:-worker}
+    restart: ${CELERYWORKER_RESTART:-${FB_RESTART:-no}}
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: ${PROJECT_NAME}-${CELERYBEAT_IMAGE_NAME:-${CELERYBEAT_HOST_NAME:-beat}}:${CELERYBEAT_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${CELERYBEAT_HOST_NAME:-beat}
+    hostname: ${PROJECT_NAME}-${CELERYBEAT_HOST_NAME:-beat}
+    restart: ${CELERYBEAT_RESTART:-${FB_RESTART:-no}}
+    command: /start-celerybeat
+
+  celeryflower:
+    <<: *django
+    image: ${PROJECT_NAME}-${CELERYFLOWER_IMAGE_NAME:-${CELERYFLOWER_HOST_NAME:-flower}}:${CELERYFLOWER_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${CELERYFLOWER_HOST_NAME:-flower}
+    hostname: ${PROJECT_NAME}-${CELERYFLOWER_HOST_NAME:-flower}
+    restart: ${CELERYFLOWER_RESTART:-${FB_RESTART:-no}}
+    command: /start-celeryflower
+
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres:
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/postgres.Dockerfile
+    image: ${PROJECT_NAME}-${POSTGRES_IMAGE_NAME:-${POSTGRES_HOST_NAME:-postgres}}:${POSTGRES_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${POSTGRES_HOST_NAME:-postgres}
+    hostname: ${PROJECT_NAME}-${POSTGRES_HOST_NAME:-postgres}
+    restart: ${POSTGRES_RESTART:-${FB_RESTART:-no}}
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo:
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/mongo.Dockerfile
+    image: ${PROJECT_NAME}-${MONGO_IMAGE_NAME:-${MONGO_HOST_NAME:-mongo}}:${MONGO_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${MONGO_HOST_NAME:-mongo}
+    hostname: ${PROJECT_NAME}-${MONGO_HOST_NAME:-mongo}
+    restart: ${MONGO_RESTART:-${FB_RESTART:-no}}
+
+
+  # REDIS ---------------------------------------------------------------------
+  redis:
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/redis.Dockerfile
+    image: ${PROJECT_NAME}-${REDIS_IMAGE_NAME:-${REDIS_HOST_NAME:-redis}}:${REDIS_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${REDIS_HOST_NAME:-redis}
+    hostname: ${PROJECT_NAME}-${REDIS_HOST_NAME:-redis}
+    restart: ${REDIS_RESTART:-${FB_RESTART:-no}}

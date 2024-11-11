@@ -1,0 +1,13 @@
+# KAFKA
+# ------------------------------------------------------------------------------
+KAFKA_CLUSTER_ID=<str?:common-id-for-all-kafka-services:3oc5-432d-l3cb-D03l>
+
+KAFKA_BROKER_1=<str!:host-port-pair-for-kafka-broker:broker-1:9092>
+KAFKA_BROKER_2=<str!:host-port-pair-for-kafka-broker:broker-2:9092>
+KAFKA_BROKER_N=<str!:host-port-pair-for-kafka-broker:broker-N:9092>
+KAFKA_BROKERS=${KAFKA_BROKER_1},${KAFKA_BROKER_2},${KAFKA_BROKER_N}
+
+KAFKA_CONTROLLER_1=<str!:host-port-pair-for-kafka-controller:controller-1:9093>
+KAFKA_CONTROLLER_2=<str!:host-port-pair-for-kafka-controller:controller-2:9093>
+KAFKA_CONTROLLER_N=<str!:host-port-pair-for-kafka-controller:controller-N:9093>
+KAFKA_CONTROLLERS=${KAFKA_CONTROLLER_1},${KAFKA_CONTROLLER_2},${KAFKA_CONTROLLER_N}

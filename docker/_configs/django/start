@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------------------------------------------------------
+
+python manage.py migrate
+python manage.py create_missing_roles_and_permissions
+
+
+if [[ $ASGI_PROTO == "https" ]] ; then
+  echo "Starting ASGI server on port ${ASGI_PORT} with SSL..."
+  exec uvicorn config.asgi:application \
+    --host 0.0.0.0 \
+    --port ${ASGI_PORT} \
+    --reload \
+    --reload-include '*.html' \
+    --ssl-keyfile /etc/ssl/privkey.pem \
+    --ssl-certfile /etc/ssl/fullchain.pem
+
+elif [[ $ASGI_PROTO == "http" ]] ; then
+  echo "Starting ASGI server on port ${ASGI_PORT} without SSL..."
+  exec uvicorn config.asgi:application \
+    --host 0.0.0.0 \
+    --port ${ASGI_PORT} \
+    --reload \
+    --reload-include '*.html'
+
+else
+  echo "Invalid ASGI_PROTO value: ${ASGI_PROTO}. Only http and https supported."
+  exit 1
+fi
+
+echo "ASGI server successfully started!"

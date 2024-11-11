@@ -1,0 +1,250 @@
+secrets:
+  django-secret-key:
+    file: ${SECRETS_DIR}/.django-secret-key
+
+  jwt-secret-key:
+    file: ${SECRETS_DIR}/.jwt-secret-key
+
+  mail-username:
+    file: ${SECRETS_DIR}/.mail-username
+  mail-password:
+    file: ${SECRETS_DIR}/.mail-password
+
+  flower-username:
+    file: ${SECRETS_DIR}/.flower-username
+  flower-password:
+    file: ${SECRETS_DIR}/.flower-password
+
+  postgres-username:
+    file: ${SECRETS_DIR}/.postgres-username
+  postgres-password:
+    file: ${SECRETS_DIR}/.postgres-password
+  postgres-secret-key:
+    file: ${SECRETS_DIR}/.postgres-secret-key
+  postgres-encryption-salt:
+    file: ${SECRETS_DIR}/.postgres-encryption-salt
+
+  mongo-root-username:
+    file: ${SECRETS_DIR}/.mongo-root-username
+  mongo-root-password:
+    file: ${SECRETS_DIR}/.mongo-root-password
+  mongo-username:
+    file: ${SECRETS_DIR}/.mongo-username
+  mongo-password:
+    file: ${SECRETS_DIR}/.mongo-password
+  mongo-secret-key:
+    file: ${SECRETS_DIR}/.mongo-secret-key
+  mongo-encryption-salt:
+    file: ${SECRETS_DIR}/.mongo-encryption-salt
+
+  rabbitmq-username:
+    file: ${SECRETS_DIR}/.rabbitmq-username
+  rabbitmq-password:
+    file: ${SECRETS_DIR}/.rabbitmq-password
+  rabbitmq-secret-key:
+    file: ${SECRETS_DIR}/.rabbitmq-secret-key
+  rabbitmq-encryption-salt:
+    file: ${SECRETS_DIR}/.rabbitmq-encryption-salt
+
+  redis-username:
+    file: ${SECRETS_DIR}/.redis-username
+  redis-password:
+    file: ${SECRETS_DIR}/.redis-password
+
+  vb-authtoken:
+    file: ${SECRETS_DIR}/.vb-authtoken
+
+
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django: &django
+    build:
+      args:
+        IMAGE_NAME: ${DJANGO_BASE_IMAGE_NAME:-python}
+        IMAGE_TAG: ${DJANGO_BASE_IMAGE_TAG:-3.9.7-slim}
+        IMAGE_USER_NAME: ${DJANGO_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${DJANGO_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${DJANGO_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${DJANGO_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/_configs}/django
+        INSTALL_SYS_PACKAGES: ${DJANGO_INSTALL_SYS_PACKAGES:-bash-completion}
+    env_file:
+      - ${ENV_FILES_DIR}/.celery
+      - ${ENV_FILES_DIR}/.django
+      - ${ENV_FILES_DIR}/.kafka
+      - ${ENV_FILES_DIR}/.mail
+      - ${ENV_FILES_DIR}/.mongo
+      - ${ENV_FILES_DIR}/.postgres
+      - ${ENV_FILES_DIR}/.rabbitmq
+      - ${ENV_FILES_DIR}/.redis
+      - ${ENV_FILES_DIR}/.vb
+    environment:
+      TEMP_DIR: ${DJANGO_TEMP_DIR:-/tmp}
+      SECRET_KEY_FILE: /run/secrets/django-secret-key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt-secret-key
+      MAIL_USERNAME_FILE: /run/secrets/mail-username
+      MAIL_PASSWORD_FILE: /run/secrets/mail-password
+      MONGO_ROOT_USERNAME_FILE: /run/secrets/mongo-root-username
+      MONGO_ROOT_PASSWORD_FILE: /run/secrets/mongo-root-password
+      MONGO_USERNAME_FILE: /run/secrets/mongo-username
+      MONGO_PASSWORD_FILE: /run/secrets/mongo-password
+      MONGO_SECRET_KEY_FILE: /run/secrets/mongo-secret-key
+      MONGO_ENCRYPTION_SALT_FILE: /run/secrets/mongo-encryption-salt
+      POSTGRES_USERNAME_FILE: /run/secrets/postgres-username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+      POSTGRES_SECRET_KEY_FILE: /run/secrets/postgres-secret-key
+      POSTGRES_ENCRYPTION_SALT_FILE: /run/secrets/postgres-encryption-salt
+      RABBITMQ_USERNAME_FILE: /run/secrets/rabbitmq-username
+      RABBITMQ_PASSWORD_FILE: /run/secrets/rabbitmq-password
+      RABBITMQ_SECRET_KEY_FILE: /run/secrets/rabbitmq-secret-key
+      RABBITMQ_ENCRYPTION_SALT_FILE: /run/secrets/rabbitmq-encryption-salt
+      REDIS_USERNAME_FILE: /run/secrets/redis-username
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+      VB_AUTH_TOKEN_FILE: /run/secrets/vb-authtoken
+    secrets:
+      - django-secret-key
+      - jwt-secret-key
+      - mail-username
+      - mail-password
+      - mongo-root-username
+      - mongo-root-password
+      - mongo-username
+      - mongo-password
+      - mongo-secret-key
+      - mongo-encryption-salt
+      - postgres-username
+      - postgres-password
+      - postgres-secret-key
+      - postgres-encryption-salt
+      - rabbitmq-username
+      - rabbitmq-password
+      - rabbitmq-secret-key
+      - rabbitmq-encryption-salt
+      - redis-username
+      - redis-password
+      - vb-authtoken
+
+  celeryworker:
+    <<: *django
+
+  celerybeat:
+    <<: *django
+
+  celeryflower:
+    <<: *django
+    environment:
+      FLOWER_USERNAME_FILE: /run/secrets/flower-username
+      FLOWER_PASSWORD_FILE: /run/secrets/flower-password
+      SECRET_KEY_FILE: /run/secrets/django-secret-key
+      JWT_SECRET_KEY_FILE: /run/secrets/jwt-secret-key
+      MAIL_USERNAME_FILE: /run/secrets/mail-username
+      MAIL_PASSWORD_FILE: /run/secrets/mail-password
+      MONGO_ROOT_USERNAME_FILE: /run/secrets/mongo-root-username
+      MONGO_ROOT_PASSWORD_FILE: /run/secrets/mongo-root-password
+      MONGO_USERNAME_FILE: /run/secrets/mongo-username
+      MONGO_PASSWORD_FILE: /run/secrets/mongo-password
+      MONGO_SECRET_KEY_FILE: /run/secrets/mongo-secret-key
+      MONGO_ENCRYPTION_SALT_FILE: /run/secrets/mongo-encryption-salt
+      POSTGRES_USERNAME_FILE: /run/secrets/postgres-username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+      POSTGRES_SECRET_KEY_FILE: /run/secrets/postgres-secret-key
+      POSTGRES_ENCRYPTION_SALT_FILE: /run/secrets/postgres-encryption-salt
+      RABBITMQ_USERNAME_FILE: /run/secrets/rabbitmq-username
+      RABBITMQ_PASSWORD_FILE: /run/secrets/rabbitmq-password
+      RABBITMQ_SECRET_KEY_FILE: /run/secrets/rabbitmq-secret-key
+      RABBITMQ_ENCRYPTION_SALT_FILE: /run/secrets/rabbitmq-encryption-salt
+      REDIS_USERNAME_FILE: /run/secrets/redis-username
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+      VB_AUTH_TOKEN_FILE: /run/secrets/vb-authtoken
+    secrets:
+      - flower-username
+      - flower-password
+      - django-secret-key
+      - jwt-secret-key
+      - mail-username
+      - mail-password
+      - mongo-root-username
+      - mongo-root-password
+      - mongo-username
+      - mongo-password
+      - mongo-secret-key
+      - mongo-encryption-salt
+      - postgres-username
+      - postgres-password
+      - postgres-secret-key
+      - postgres-encryption-salt
+      - rabbitmq-username
+      - rabbitmq-password
+      - rabbitmq-secret-key
+      - rabbitmq-encryption-salt
+      - redis-username
+      - redis-password
+      - vb-authtoken
+
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres:
+    build:
+      args:
+        IMAGE_NAME: ${POSTGRES_BASE_IMAGE_NAME:-postgres}
+        IMAGE_TAG: ${POSTGRES_BASE_IMAGE_TAG:-16}
+        IMAGE_USER_NAME: ${POSTGRES_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${POSTGRES_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${POSTGRES_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${POSTGRES_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/configs}/postgres
+    env_file:
+      - ${ENV_FILES_DIR}/.postgres
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/postgres-username
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+    secrets:
+      - postgres-username
+      - postgres-password
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo:
+    build:
+      args:
+        IMAGE_NAME: ${MONGO_BASE_IMAGE_NAME:-mongo}
+        IMAGE_TAG: ${MONGO_BASE_IMAGE_TAG:-4.4.8}
+        IMAGE_USER_NAME: ${MONGO_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${MONGO_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${MONGO_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${MONGO_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/configs}/mongo
+    env_file:
+      - ${ENV_FILES_DIR}/.mongo
+    environment:
+      MONGODB_INITDB_ROOT_USERNAME_FILE: /run/secrets/mongo-root-username
+      MONGODB_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo-root-password
+      MONGO_USERNAME_FILE: /run/secrets/mongo-username
+      MONGO_PASSWORD_FILE: /run/secrets/mongo-password
+    secrets:
+      - mongo-root-username
+      - mongo-root-password
+      - mongo-username
+      - mongo-password
+
+
+  # REDIS ---------------------------------------------------------------------
+  redis:
+    build:
+      args:
+        IMAGE_NAME: ${REDIS_BASE_IMAGE_NAME:-redis}
+        IMAGE_TAG: ${REDIS_BASE_IMAGE_TAG:-6.2.5}
+        IMAGE_USER_NAME: ${REDIS_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${REDIS_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${REDIS_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${REDIS_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/configs}/redis
+    env_file:
+      - ${ENV_FILES_DIR}/.redis
+    environment:
+      REDIS_USERNAME_FILE: /run/secrets/redis-username
+      REDIS_PASSWORD_FILE: /run/secrets/redis-password
+    secrets:
+      - redis-username
+      - redis-password

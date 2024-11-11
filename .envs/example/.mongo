@@ -1,0 +1,7 @@
+# MONGODB
+# -----------------------------------------------------------------------------
+MONGO_HOST=<str!:name-of-mongo-host:pa-mongo>
+MONGO_PORT=<int!:port-on-mongo-host-where-mongo-is-hosted:27017>
+
+MONGO_ACTIONS_DB=<str!:name-of-actions-db:actions>
+MONGO_STORES_DB=<str!:name-of-stores-db:stores>

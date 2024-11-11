@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+# -----------------------------------------------------------------------------
+
+REDIS_USERNAME=$(cat ${REDIS_USERNAME_FILE})
+REDIS_PASSWORD=$(cat ${REDIS_PASSWORD_FILE})
+
+if [[ -n "$REDIS_USERNAME" && -n "$REDIS_PASSWORD" ]]; then
+    REDIS_URL="redis://$REDIS_USERNAME:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT"
+elif [[ -n "$REDIS_PASSWORD" ]]; then
+    REDIS_URL="redis://default:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT"
+elif [[ -n "$REDIS_USERNAME" ]]; then
+    REDIS_URL="redis://$REDIS_USERNAME@$REDIS_HOST:$REDIS_PORT"
+else
+    REDIS_URL="redis://$REDIS_HOST:$REDIS_PORT"
+fi
+
+CELERY_BROKER_URL="${REDIS_URL}"
+
+CELERY_FLOWER_USER=$(cat ${FLOWER_USERNAME_FILE})
+CELERY_FLOWER_PASSWORD=$(cat ${FLOWER_PASSWORD_FILE})
+
+exec watchfiles --filter python celery.__main__.main \
+    --args \
+    "-A config.celery.config -b \"${CELERY_BROKER_URL}\" flower --basic_auth=\"${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD}\""

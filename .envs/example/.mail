@@ -1,0 +1,5 @@
+# EMAIL
+# ------------------------------------------------------------------------------
+EMAIL_SENDER_ADDRESS=<str!:email-to-send-mail-from:sender@visum.is>
+EMAIL_HOST=<str!:email-host:smtp.visum.is>
+EMAIL_PORT=<int!:email-port:465>

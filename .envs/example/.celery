@@ -1,0 +1,9 @@
+# CELERY
+# -----------------------------------------------------------------------------
+CELERY_WORKER_READINESS_FILE=<str!:name-of-the-file-for-worker-readiness-probes:worker-ready>
+CELERY_WORKER_LIVENESS_FILE=<str!:name-of-the-file-for-worker-liveness-probes:worker-alive>
+CELERY_BEAT_READINESS_FILE=<str!:name-of-the-file-for-beat-readiness-probes:beat-ready>
+CELERY_BEAT_LIVENESS_FILE=<str!:name-of-the-file-for-beat-liveness-probes:beat-alive>
+
+CELERY_LIVENESS_UPDATE_INTERVAL=<int!:interval-in-seconds-for-updating-liveness-file:2>
+CELERY_LIVENESS_TIMEOUT=<int!:time-after-which-liveness-probe-fails:60>

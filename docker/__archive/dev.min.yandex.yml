@@ -1,0 +1,175 @@
+name: pa-dev
+
+
+volumes:
+  pa_postgres_data: {}
+  pa_postgres_data_backups: {}
+  pa_mongo_data: {}
+  pa_mongo_data_backups: {}
+  grafana_data: {}
+
+
+networks:
+  common:
+    name: common-net
+    driver: bridge
+    external: true
+  personal_account:
+    name: personal_account-net
+    driver: bridge
+    external: false
+  kafka:
+    name: kafka-net
+    driver: bridge
+    external: false
+
+
+services:
+  django: &django
+    build:
+      context: ../
+      dockerfile: ./docker/default/django/Dockerfile
+    image: pa_django
+    container_name: pa_django
+    depends_on:
+      - postgres
+      - redis
+      - mongo
+      - broker-1
+    volumes:
+      - ../django_account:/app:z
+      - ../scripts:/scripts:z
+      - /etc/letsencrypt/live/account.v-best-scan.online/fullchain.pem:/etc/ssl/fullchain.pem:ro
+      - /etc/letsencrypt/live/account.v-best-scan.online/privkey.pem:/etc/ssl/privkey.pem:ro
+    env_file:
+      - ../.envs/.dev/.django.min
+      - ../.envs/.dev/.mongo
+      - ../.envs/.dev/.postgres
+      - ../.envs/.dev/.kafka.min
+      - ../.envs/.dev/.rabbitmq
+      - ../.envs/.dev/.secrets
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - common
+      - personal_account
+    command: /start
+
+  celeryworker:
+    <<: *django
+    image: pa_celeryworker
+    container_name: pa_celeryworker
+    depends_on:
+      - redis
+      - postgres
+      - mongo
+    ports: [ ]
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: pa_celerybeat
+    container_name: pa_celerybeat
+    ports: [ ]
+    command: /start-celerybeat
+
+  celeryflower:
+    <<: *django
+    image: pa_celeryflower
+    container_name: pa_celeryflower
+    ports:
+      - "5555:5555"
+    command: /start-flower
+
+  postgres:
+    build:
+      context: ../
+      dockerfile: ./docker/default/postgres/Dockerfile
+    image: pa_postgres
+    container_name: pa_postgres
+    volumes:
+      - pa_postgres_data:/var/lib/postgresql/data
+      - pa_postgres_data_backups:/backups
+      - ./default/postgres/initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - personal_account
+    env_file:
+      - ../.envs/.dev/.postgres
+
+  mongo:
+    image: mongodb/mongodb-community-server:7.0.3-ubi9
+    container_name: pa_mongo
+    volumes:
+      - pa_mongo_data:/data/db
+      - ./default/mongo/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh
+    # - ./configs/mongo.conf:/etc/mongo/mongo.conf:ro
+    ports:
+      - "27017:27017"
+    networks:
+      - personal_account
+    env_file:
+      - ../.envs/.dev/.mongo
+
+  redis:
+    image: docker.io/redis:6
+    container_name: pa_redis
+    networks:
+      - personal_account
+
+  controller-1: &kafka
+    build:
+      context: ../
+      dockerfile: ./docker/default/kafka/Dockerfile
+    container_name: controller-1
+    environment:
+      KAFKA_PROCESS_ROLES: "controller"
+      KAFKA_NODE_ID: 1
+      INNER_PORT: 9093
+    env_file:
+      - ../.envs/.dev/.kafka.min
+    volumes:
+      - ./default/kafka/jmx_exporter/jmx_prometheus_javaagent-1.0.1.jar:/opt/jmx_exporter/jmx_prometheus_javaagent.jar
+      - ./default/kafka/jmx_exporter/config.yml:/opt/jmx_exporter/kafka_jmx_exporter_config.yml
+    networks:
+      - kafka
+    command: /home/appuser/start-kafka
+
+  broker-1:
+    <<: *kafka
+    container_name: broker-1
+    environment:
+      KAFKA_PROCESS_ROLES: "broker"
+      KAFKA_NODE_ID: 4
+      INNER_PORT: 9092
+      OUTER_PORT: 19092
+    networks:
+      - kafka
+      - common
+    depends_on:
+      - controller-1
+
+  prometheus:
+    image: bitnami/prometheus:2.48.0
+    container_name: prometheus
+    volumes:
+      - ./dev/prometheus/config.yml:/opt/bitnami/prometheus/conf/prometheus.yml
+    networks:
+      - common
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: grafana
+    env_file:
+      - ../.envs/.dev/.grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./default/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - common

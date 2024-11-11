@@ -1,0 +1,21 @@
+name: precommit
+
+
+services:
+  django: &django
+    build:
+      context: ../
+      dockerfile: /default/django/Dockerfile
+    image: personal_account_default_django
+    container_name: personal_account_default_django
+    volumes:
+      - ../django_account:/app:z
+      - /etc/letsencrypt/live/main.hello5.pro/fullchain.pem:/etc/ssl/fullchain.pem:ro
+      - /etc/letsencrypt/live/main.hello5.pro/privkey.pem:/etc/ssl/privkey.pem:ro
+    env_file:
+      - ../.envs/.default/.django
+      - ../.envs/.default/.postgres
+      - ../.envs/.default/.mongo
+    ports:
+      - "443:443"
+    command: /start

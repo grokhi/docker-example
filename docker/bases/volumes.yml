@@ -1,0 +1,45 @@
+# Volumes definitions to reuse across different stages of the project
+# -----------------------------------------------------------------------------
+
+
+volumes:  # rewrite in extended syntax
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres_data: {}
+  postgres_data_backups: {}
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo_data: {}
+  mongo_data_backups: {}
+
+
+  # GRAFANA -------------------------------------------------------------------
+  grafana_data: {}
+
+
+services:
+
+  django: &django
+    volumes:
+      - ../../django_account:/app:z
+      - ../../scripts:/scripts:z
+
+  celeryworker:
+    <<: *django
+
+  celerybeat:
+    <<: *django
+
+  celeryflower:
+    <<: *django
+
+  postgres:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
+      - ${CONFIGS_DIR}/postgres/initdb:/docker-entrypoint-initdb.d
+
+  mongo:
+    volumes:
+      - mongo_data:/data/db

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------------------------------------------------------
+
+READINESS_FILE="${TEMP_DIR}/${CELERY_BEAT_READINESS_FILE}"
+LIVENESS_FILE="${TEMP_DIR}/${CELERY_BEAT_LIVENESS_FILE}"
+
+check_readiness() {
+    if [[ ! -f "$READINESS_FILE" ]]; then
+        echo "Readiness file for celery beat was not found!"
+        exit 1
+    fi
+}
+
+check_liveness() {
+    if [[ ! -f "$LIVENESS_FILE" ]]; then
+        echo "Liveness file for celery beat was not found!"
+        exit 1
+    fi
+
+    heartbeat_timestamp=$(stat -c %Y "$LIVENESS_FILE")
+    current_timestamp=$(date +%s)
+    time_diff=$((current_timestamp - heartbeat_timestamp))
+
+    if (( time_diff > ${CELERY_LIVENESS_TIMEOUT} )); then
+        echo "Liveness file timestamp for celery beat is older than ${CELERY_LIVENESS_TIMEOUT} seconds!"
+        exit 1
+    fi
+
+    echo "Liveness file found for celery beat and timestamp matches the given constraint"
+}
+
+# -----------------------------------------------------------------------------
+
+check_readiness
+check_liveness
+exit 0

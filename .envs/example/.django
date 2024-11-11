@@ -1,0 +1,18 @@
+# GENERAL
+# ------------------------------------------------------------------------------
+STAGE=<str!:stage-name:local>
+
+DOMAIN_NAME=<str!:domain-where-app-is-deployed:some.domain.com>
+FRONTEND_URL=<str!:url-where-frontend-app-is-deployed:https://0.0.0.0>
+
+
+# DJANGO SETTINGS
+# -----------------------------------------------------------------------------
+DJANGO_ALLOWED_HOSTS=<str!:names-of-hosts-allowed-to-access-the-app:localhost,0.0.0.0>
+DJANGO_PORT=<int!:port-where-django-app-is-running:8000>
+
+
+# OTHER
+# -----------------------------------------------------------------------------
+ASGI_PORT=<int!:port-where-asgi-app-is-running:80>
+ASGI_PROTO=<enum!:protocol-asgi-uses:https|http>

@@ -1,0 +1,99 @@
+# Security options configurations
+# -----------------------------------------------------------------------------
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - ${DJANGO_TEMP_DIR:-/tmp}
+    cpu_count: "3"
+    mem_reservation: "256m"
+    mem_limit: "1024m"
+    memswap_limit: "2048m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+  celeryworker:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - ${DJANGO_TEMP_DIR:-/tmp}
+    cpu_count: "3"
+    mem_reservation: "2048m"
+    mem_limit: "4096m"
+    memswap_limit: "8192m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+  celerybeat:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - ${DJANGO_TEMP_DIR:-/tmp}
+    cpu_count: "1"
+    mem_reservation: "256m"
+    mem_limit: "512m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+  celeryflower:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - ${DJANGO_TEMP_DIR:-/tmp}
+    cpu_count: "1"
+    mem_reservation: "256m"
+    mem_limit: "512m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - /var/run/postgresql
+    cpu_count: "2"
+    mem_reservation: "128m"
+    mem_limit: "256m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo:
+    privileged: false
+    read_only: true
+    tmpfs:
+      - /tmp
+    cpu_count: "2"
+    mem_reservation: "256m"
+    mem_limit: "512m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+
+  # REDIS ---------------------------------------------------------------------
+  redis:
+    privileged: false
+    read_only: true
+    cpu_count: "2"
+    mem_reservation: "128m"
+    mem_limit: "256m"
+    memswap_limit: "1024m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"

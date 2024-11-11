@@ -1,0 +1,6 @@
+# POSTGRESQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=<str!:host-where-postgres-is-served:postgres_host>
+POSTGRES_PORT=<int!:port-at-host-where-postgres-is-served:5432>
+
+POSTGRES_DB=<str!:name-of-postgres-db:postgres_db>

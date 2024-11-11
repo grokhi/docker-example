@@ -1,0 +1,27 @@
+# EMAIL ---------------------------------------------------------------------
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:14.0.0
+    container_name: mailserver
+    hostname: main.hello5.pro
+    restart: always
+    env_file: mailserver.env
+    ports: [
+      "25:25",  # SMTP  (explicit TLS => STARTTLS, Authentication is DISABLED => use port 465/587 instead)
+      "143:143",  # IMAP4 (explicit TLS => STARTTLS)
+      "465:465",  # ESMTP (implicit TLS)
+      "587:587",  # ESMTP (explicit TLS => STARTTLS)
+      "993:993"  # IMAP4 (implicit TLS)
+    ]
+    volumes:
+      - ./docker-data/dms/mail-data/:/var/mail/
+      - ./docker-data/dms/mail-state/:/var/mail-state/
+      - ./docker-data/dms/mail-logs/:/var/log/mail/
+      - ./docker-data/dms/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    stop_grace_period: 1m
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 5s
+      retries: 0

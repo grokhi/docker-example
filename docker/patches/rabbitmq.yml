@@ -1,0 +1,61 @@
+# Patch for rabbitmq instantiation locally
+# -----------------------------------------------------------------------------
+secrets:
+
+  rabbitmq-username:
+    file: ${SECRETS_DIR}/.rabbitmq-username
+  rabbitmq-password:
+    file: ${SECRETS_DIR}/.rabbitmq-password
+
+
+services:
+
+  # RABBITMQ ------------------------------------------------------------------
+  rabbitmq:
+
+    image: ${PROJECT_NAME}-${RABBITMQ_IMAGE_NAME:-${RABBITMQ_HOST_NAME:-rabbitmq}}:${RABBITMQ_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${RABBITMQ_HOST_NAME:-rabbitmq}
+    hostname: ${PROJECT_NAME}-${RABBITMQ_HOST_NAME:-rabbitmq}
+    restart: ${RABBITMQ_RESTART:-${FB_RESTART:-no}}
+
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/rabbitmq.Dockerfile
+      args:
+        IMAGE_NAME: ${RABBITMQ_BASE_IMAGE_NAME}
+        IMAGE_TAG: ${RABBITMQ_BASE_IMAGE_TAG}
+        IMAGE_USER_NAME: ${RABBITMQ_IMAGE_USER_NAME-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${RABBITMQ_IMAGE_USER_ID-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${RABBITMQ_IMAGE_GROUP_NAME-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${RABBITMQ_IMAGE_GROUP_ID-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/configs}/rabbitmq
+
+    env_file:
+      - ${ENV_FILES_DIR}/.rabbitmq
+    environment:
+      CONTAINER_NAME: ${PROJECT_NAME}-${RABBITMQ_SERVICE_NAME:-rabbitmq}
+      RABBITMQ_USERNAME_FILE: /run/secrets/rabbitmq-username
+      RABBITMQ_PASSWORD_FILE: /run/secrets/rabbitmq-password
+    secrets:
+      - rabbitmq-username
+      - rabbitmq-password
+
+    healthcheck:
+      test: rabbitmq-diagnostics -q status
+      interval: ${RABBITMQ_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${RABBITMQ_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${RABBITMQ_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${RABBITMQ_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+    privileged: false
+    read_only: true
+    cpu_count: "3"
+    mem_reservation: "1024m"
+    mem_limit: "2048m"
+    memswap_limit: "8192m"
+    pids_limit: 200
+    security_opt:
+      - "no-new-privileges=true"
+
+    networks:
+      - jobs

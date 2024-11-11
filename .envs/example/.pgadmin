@@ -1,0 +1,14 @@
+# PGADMIN
+# -----------------------------------------------------------------------------
+PGADMIN_DEFAULT_EMAIL=<email?:email-for-admin-user:pgadmin_admin@visum.is>
+
+PGADMIN_DISABLE_POSTFIX=<any?:disable-postfix-mail-server:yes>
+PGADMIN_ENABLE_TLS=<any?:enable-tls-for-pgadmin:yes>
+PGADMIN_LISTEN_ADDRESS=<str?:host-on-which-pgadmin-is-served:0.0.0.0>
+PGADMIN_LISTEN_PORT=<int?:port-on-which-pgadmin-is-served:80>
+PGADMIN_SERVER_JSON_FILE=<str?:path-to-server-json-file:/pgadmin4/servers.json>
+PGADMIN_PREFERENCES_JSON_FILE=<str?:path-to-preferences-json-file:/pgadmin4/preferences.json>
+
+GUNICORN_ACCESS_LOGFILE=<str?:path-to-access-logfile:->
+GUNICORN_LIMIT_REQUEST_LINE=<int!:limit-request-line:8190>
+GUNICORN_THREADS=<int!:number-of-threads:25>

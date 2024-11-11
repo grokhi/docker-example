@@ -1,0 +1,4 @@
+# REDIS
+# ------------------------------------------------------------------------------
+REDIS_HOST=<str!:redis-host:pa-redis>
+REDIS_PORT=<int!:redis-port:6379>

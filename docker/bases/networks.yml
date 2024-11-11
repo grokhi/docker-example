@@ -1,0 +1,89 @@
+# Networks configurations to reuse across different stages of the project
+# -----------------------------------------------------------------------------
+
+
+networks:
+
+  # PERSONAL ACCOUNT SERVICES GROUP -------------------------------------------
+  personal-account: # Used for internal communication between services related to personal account
+    name: ${PROJECT_NETWORK_NAME:-${PROJECT_NAME:-pa}-net}
+    driver: bridge
+    external: false
+
+
+  # COMMUNICATION -------------------------------------------------------------
+  jobs:  # Used for internal communication between service groups
+    name: ${JOBS_NETWORK_NAME:-jobs-net}
+    driver: bridge
+    external: true
+
+  events:  # Used for sending events to Kafka cluster
+    name: ${EVENTS_NETWORK_NAME:-events-net}
+    driver: bridge
+    external: true
+
+  communication:  # Used for communication with Knowledge Base
+    name: ${COMMUNICATION_NETWORK_NAME:-communication-net}
+    driver: bridge
+    external: true
+
+
+  # ROUTING -------------------------------------------------------------------
+  routing:  # Used for routing external requests to internal services
+    name: ${ROUTING_NETWORK_NAME:-routing-net}
+    driver: bridge
+    external: true
+
+
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django:
+    networks:
+      - routing
+      - jobs
+      - events
+      - communication
+      - personal-account
+
+  celeryworker:
+    networks:
+      - routing
+      - jobs
+      - events
+      - communication
+      - personal-account
+
+  celerybeat:
+    networks:
+      - routing
+      - jobs
+      - events
+      - communication
+      - personal-account
+
+  celeryflower:
+    networks:
+      - routing
+      - jobs
+      - events
+      - communication
+      - personal-account
+
+
+  # POSTGRES ------------------------------------------------------------------
+  postgres:
+    networks:
+      - personal-account
+
+
+  # MONGO ---------------------------------------------------------------------
+  mongo:
+    networks:
+      - personal-account
+
+
+  # REDIS ---------------------------------------------------------------------
+  redis:
+    networks:
+      - personal-account

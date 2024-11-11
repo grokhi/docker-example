@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------------------------------------------------------
+
+export USE_DOCKER=yes
+export IPYTHONDIR=/app/.ipython
+
+# run only for django, not worker, beat or flower
+if [[ $HOSTNAME == "pa-django" ]]; then
+  for var in POSTGRES_USERNAME_FILE POSTGRES_PASSWORD_FILE POSTGRES_HOST POSTGRES_PORT POSTGRES_DB \
+           MONGO_USERNAME_FILE MONGO_PASSWORD_FILE MONGO_HOST MONGO_PORT \
+           REDIS_USERNAME_FILE REDIS_PASSWORD_FILE REDIS_HOST REDIS_PORT \
+           RABBITMQ_USERNAME_FILE RABBITMQ_PASSWORD_FILE \
+           KAFKA_BROKERS; do
+    : "${!var:?Variable $var is not set}"
+  done
+
+
+  pushd /scripts > /dev/null
+
+    python -m availability.wait_for_postgres \
+      --dbname "${POSTGRES_DB}" \
+      --user "$(<${POSTGRES_USERNAME_FILE})" \
+      --password "$(<${POSTGRES_PASSWORD_FILE})" \
+      --host "${POSTGRES_HOST}" \
+      --port "${POSTGRES_PORT}"
+
+    python -m availability.wait_for_mongo \
+      --dbname "admin" \
+      --user "$(<${MONGO_ROOT_USERNAME_FILE})" \
+      --password "$(<${MONGO_ROOT_PASSWORD_FILE})" \
+      --host "${MONGO_HOST}" \
+      --port "${MONGO_PORT}"
+
+    python -m availability.wait_for_redis \
+      --dbname "0" \
+      --user "$(<${REDIS_USERNAME_FILE})" \
+      --password "$(<${REDIS_PASSWORD_FILE})" \
+      --host "${REDIS_HOST}" \
+      --port "${REDIS_PORT}"
+
+    python -m availability.wait_for_rabbitmq \
+      --user "$(<${RABBITMQ_USERNAME_FILE})" \
+      --password "$(<${RABBITMQ_PASSWORD_FILE})" \
+      --host "${RABBITMQ_HOST}" \
+      --port "${RABBITMQ_PORT}"
+
+    python -m availability.wait_for_kafka \
+      --bootstrap-servers $(echo ${KAFKA_BROKERS} | sed "s/,/ /g")
+
+  popd > /dev/null
+fi
+
+
+exec "$@"

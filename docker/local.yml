@@ -1,0 +1,69 @@
+services:
+
+  django: &django
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "443:443"  # HOST_PORT:CONTAINER_PORT
+
+  celeryworker:
+    <<: *django
+    depends_on:
+      django:
+        condition: service_healthy
+    ports: [ ]
+
+  celerybeat:
+    <<: *django
+    depends_on:
+      django:
+        condition: service_healthy
+    ports: [ ]
+
+  celeryflower:
+    <<: *django
+    depends_on:
+      django:
+        condition: service_healthy
+    ports:
+      - "5555:5555"
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5050:5050"
+
+  mongo:
+    ports:
+      - "27017:27017"
+
+  mongoexpress:
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    ports:
+      - "5672:5672"
+
+
+

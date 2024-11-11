@@ -1,0 +1,10 @@
+# change the path to the location of your ssl certificates for linux
+# -----------------------------------------------------------------------------
+
+
+services:
+
+  # DJANGO --------------------------------------------------------------------
+  django:
+    volumes:
+      - ../../.ssl:/etc/ssl:ro

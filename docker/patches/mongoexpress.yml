@@ -1,0 +1,64 @@
+# Mongoexpress for monitoring and debugging MongoDB
+# -----------------------------------------------------------------------------
+secrets:
+
+  mongoexpress-username:
+    file: ${SECRETS_DIR}/.mongoexpress-username
+  mongoexpress-password:
+    file: ${SECRETS_DIR}/.mongoexpress-password
+
+
+services:
+
+  # MONGO-EXPRESS -------------------------------------------------------------
+  mongoexpress:
+
+    image: ${PROJECT_NAME}-${MONGOEXPRESS_IMAGE_NAME:-${MONGOEXPRESS_HOST_NAME:-mongoexpress}}:${MONGOEXPRESS_IMAGE_TAG:-${FB_IMAGE_TAG:-latest}}
+    container_name: ${PROJECT_NAME}-${MONGOEXPRESS_HOST_NAME:-mongoexpress}
+    hostname: ${PROJECT_NAME}-${MONGOEXPRESS_HOST_NAME:-mongoexpress}
+    restart: ${MONGOEXPRESS_RESTART:-${FB_RESTART:-no}}
+
+    build:
+      context: ../..
+      dockerfile: ${DOCKERFILES_DIR}/mongoexpress.Dockerfile
+      args:
+        IMAGE_NAME: ${MONGOEXPRESS_BASE_IMAGE_NAME}
+        IMAGE_TAG: ${MONGOEXPRESS_BASE_IMAGE_TAG}
+        IMAGE_USER_NAME: ${MONGOEXPRESS_IMAGE_USER_NAME:-${FB_IMAGE_USER_NAME:-user}}
+        IMAGE_USER_ID: ${MONGOEXPRESS_IMAGE_USER_ID:-${FB_IMAGE_USER_ID:-1000}}
+        IMAGE_GROUP_NAME: ${MONGOEXPRESS_IMAGE_GROUP_NAME:-${FB_IMAGE_GROUP_NAME:-user}}
+        IMAGE_GROUP_ID: ${MONGOEXPRESS_IMAGE_GROUP_ID:-${FB_IMAGE_GROUP_ID:-1000}}
+        CONFIG_DIR: ${CONFIGS_DIR:-./docker/_configs}/mongoexpress
+
+    env_file:
+      - ${ENV_FILES_DIR}/.mongoexpress
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME_FILE: /run/secrets/mongoexpress-username
+      ME_CONFIG_BASICAUTH_PASSWORD_FILE: /run/secrets/mongoexpress-password
+      ME_CONFIG_MONGODB_ADMINUSERNAME_FILE: /run/secrets/mongo-root-username
+      ME_CONFIG_MONGODB_ADMINPASSWORD_FILE: /run/secrets/mongo-root-password
+    secrets:
+      - mongoexpress-username
+      - mongoexpress-password
+      - mongo-root-username
+      - mongo-root-password
+
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://0.0.0.0:8081/status" ]
+      interval: ${MONGOEXPRESS_HC_INTERVAL:-${FB_HC_INTERVAL:-1m}}
+      timeout: ${MONGOEXPRESS_HC_TIMEOUT:-${FB_HC_TIMEOUT:-15s}}
+      retries: ${MONGOEXPRESS_HC_RETRIES:-${FB_HC_RETRIES:-5}}
+      start_period: ${MONGOEXPRESS_HC_START_PERIOD:-${FB_HC_START_PERIOD:-1m}}
+
+    privileged: false
+    read_only: true
+    cpu_count: "1"
+    mem_reservation: "128m"
+    mem_limit: "256m"
+    memswap_limit: "512m"
+    pids_limit: 100
+    security_opt:
+      - "no-new-privileges=true"
+
+    networks:
+      - personal-account

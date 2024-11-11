@@ -1,0 +1,284 @@
+# COMPOSE PATH
+# -----------------------------------------------------------------------------
+COMPOSE_PATH_SEPARATOR=:  # do not change this value, it is for compatibility with windows
+
+COMPOSE_FILE_00=<str!:rel-path-to-services-yml>:./docker/_bases/services.yml
+COMPOSE_FILE_01=<str!:rel-path-to-stage-yml>:./docker/stage.yml
+
+COMPOSE_FILE=<str!:rel-paths-separated-by-separator:./docker/_bases/services.yml:./docker/stage.yml>
+
+
+# COMPOSE SETTINGS
+# -----------------------------------------------------------------------------
+STAGE_NAME=<str!:stage-name:dev>
+PROJECT_NAME=<str!:name-used-for-bundling-by-docker-compose:pa>
+
+COMPOSE_PROJECT_NAME=${STAGE_NAME}-${PROJECT_NAME}  # do not change this value
+
+
+# ENVIRONMENT VARIABLES
+# -----------------------------------------------------------------------------
+ENV_FILES_DIR=<str!:relative-path-directory-containing-env-files-wo-trailing-slash>:./.envs/example/.env>
+SECRETS_DIR=<str!:relative-path-directory-containing-secrets-wo-trailing-slash>:./.envs/example/.secrets>
+DOCKERFILES_DIR=<str!:relative-path-directory-containing-dockerfiles-wo-trailing-slash>:./docker/dockerfiles>
+CONFIGS_DIR=<str!:relative-path-directory-containing-configs-wo-trailing-slash>:./docker/configs>
+
+
+# FALLBACKS FOR ANY RESTART
+# -----------------------------------------------------------------------------
+FB_RESTART=<enum?:fallback-for-any-restart-policy:no|always|on-failure|unless-stopped>
+
+
+# FALLBACKS FOR ANY TAG
+# -----------------------------------------------------------------------------
+FB_IMAGE_TAG=<str!:default-tag-for-untagged-image:default>
+
+
+# FALLBACKS FOR ANY HEALTHCHECK
+# -----------------------------------------------------------------------------
+FB_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+FB_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+FB_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+FB_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+
+# FALLBACKS FOR NON-ROOT USERS
+# -----------------------------------------------------------------------------
+FB_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+FB_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+FB_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+FB_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# NETWORKS
+# -----------------------------------------------------------------------------
+PROJECT_NETWORK_NAME=<str?:network-name:personal-account>
+
+JOBS_NETWORK_NAME=<str!:network-name:jobs>
+EVENTS_NETWORK_NAME=<str!:network-name:events>
+COMMUNICATION_NETWORK_NAME=<str!:network-name:communication>
+
+ROUTING_NETWORK_NAME=<str!:network-name:routing>
+
+
+# DJANGO
+# -----------------------------------------------------------------------------
+DJANGO_HOST_NAME=<str!:container-name:django>
+DJANGO_IMAGE_NAME=<str?:name-of-the-service-image:django>
+DJANGO_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+DJANGO_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:python>
+DJANGO_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:3.12.2-slim-bookworm>
+
+DJANGO_TEMP_DIR=<str?:path-to-temporary-directory:/tmp>
+DJANGO_INSTALL_SYS_PACKAGES=<str!:sys-packages-to-install-sep-by-space:nano telnet sudo>
+
+DJANGO_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+DJANGO_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+DJANGO_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+DJANGO_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+DJANGO_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+DJANGO_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+DJANGO_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+DJANGO_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+DJANGO_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# CELERYWORKER
+# -----------------------------------------------------------------------------
+CELERYWORKER_HOST_NAME=<str!:container-name:worker>
+CELERYWORKER_IMAGE_NAME=<str?:name-of-the-service-image:worker>
+CELERYWORKER_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+CELERYWORKER_BASE_IMAGE_NAME=<str?:address-of-base-image-the-service-uses:python>
+CELERYWORKER_BASE_IMAGE_TAG=<str?:version-of-base-image-the-service-uses:3.12.2-slim-bookworm>
+
+CELERYWORKER_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+CELERYWORKER_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+CELERYWORKER_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+CELERYWORKER_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+CELERYWORKER_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+CELERYWORKER_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+CELERYWORKER_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+CELERYWORKER_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+CELERYWORKER_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# CELERYBEAT
+# -----------------------------------------------------------------------------
+CELERYBEAT_HOST_NAME=<str!:container-name:beat>
+CELERYBEAT_IMAGE_NAME=<str?:name-of-the-service-image:beat>
+CELERYBEAT_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+CELERYBEAT_BASE_IMAGE_NAME=<str?:address-of-base-image-the-service-uses:python>
+CELERYBEAT_BASE_IMAGE_TAG=<str?:version-of-base-image-the-service-uses:3.12.2-slim-bookworm>
+
+CELERYBEAT_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+CELERYBEAT_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+CELERYBEAT_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+CELERYBEAT_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+CELERYBEAT_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+CELERYBEAT_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+CELERYBEAT_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+CELERYBEAT_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+CELERYBEAT_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# CELERYFLOWER
+# -----------------------------------------------------------------------------
+CELERYFLOWER_HOST_NAME=<str!:container-name:flower>
+CELERYFLOWER_IMAGE_NAME=<str?:name-of-the-service-image:flower>
+CELERYFLOWER_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+CELERYFLOWER_BASE_IMAGE_NAME=<str?:address-of-base-image-the-service-uses:python>
+CELERYFLOWER_BASE_IMAGE_TAG=<str?:version-of-base-image-the-service-uses:3.12.2-slim-bookworm>
+
+CELERYFLOWER_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+CELERYFLOWER_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+CELERYFLOWER_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+CELERYFLOWER_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+CELERYFLOWER_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+CELERYFLOWER_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+CELERYFLOWER_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+CELERYFLOWER_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+CELERYFLOWER_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# POSTGRES
+# -----------------------------------------------------------------------------
+POSTGRES_HOST_NAME=<str!:container-name:postgres>
+POSTGRES_IMAGE_NAME=<str!:name-of-the-service-image:postgres>
+POSTGRES_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+POSTGRES_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:postgres>
+POSTGRES_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:16>
+
+POSTGRES_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+POSTGRES_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+POSTGRES_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+POSTGRES_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+POSTGRES_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+POSTGRES_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+POSTGRES_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+POSTGRES_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+POSTGRES_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# MONGO
+# -----------------------------------------------------------------------------
+MONGO_HOST_NAME=<str!:container-name:mongo>
+MONGO_IMAGE_NAME=<str!:name-of-the-service-image:mongo>
+MONGO_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+MONGO_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:mongodb/mongodb-community-server>
+MONGO_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:7.0.3-ubi9>
+
+MONGO_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+MONGO_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+MONGO_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+MONGO_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+MONGO_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+MONGO_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+MONGO_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+MONGO_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+MONGO_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# REDIS
+# -----------------------------------------------------------------------------
+REDIS_HOST_NAME=<str!:container-name:redis>
+REDIS_IMAGE_NAME=<str!:name-of-the-service-image:redis>
+REDIS_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+REDIS_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:redis>
+REDIS_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:7.4.1-alpine>
+
+REDIS_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+REDIS_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+REDIS_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+REDIS_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+REDIS_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+REDIS_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+REDIS_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+REDIS_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+REDIS_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# PGADMIN
+# -----------------------------------------------------------------------------
+PGADMIN_HOST_NAME=<str!:container-name:pgadmin>
+PGADMIN_IMAGE_NAME=<str!:name-of-the-service-image:pgadmin>
+PGADMIN_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+PGADMIN_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:dpage/pgadmin4>
+PGADMIN_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:5.7>
+
+PGADMIN_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+PGADMIN_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+PGADMIN_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+PGADMIN_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+PGADMIN_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+PGADMIN_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+PGADMIN_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+PGADMIN_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+PGADMIN_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# MONGOEXPRESS  (required only for some builds)
+# -----------------------------------------------------------------------------
+MONGOEXPRESS_HOST_NAME=<str!:container-name:mongoexpress>
+MONGOEXPRESS_IMAGE_NAME=<str!:name-of-the-service-image:mongoexpress>
+MONGOEXPRESS_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+MONGOEXPRESS_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:mongo-express>
+MONGOEXPRESS_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:1.0.2-20-alpine3.19>
+
+MONGOEXPRESS_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+MONGOEXPRESS_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+MONGOEXPRESS_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+MONGOEXPRESS_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+MONGOEXPRESS_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+MONGOEXPRESS_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+MONGOEXPRESS_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+MONGOEXPRESS_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+MONGOEXPRESS_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>
+
+
+# RABBITMQ  (required only for some local builds)
+# -----------------------------------------------------------------------------
+RABBITMQ_HOST_NAME=<str!:container-name:rabbitmq>
+RABBITMQ_IMAGE_NAME=<str!:name-of-the-service-image:rabbitmq>
+RABBITMQ_IMAGE_TAG=<str?:tag-for-the-service-image:default>
+
+RABBITMQ_BASE_IMAGE_NAME=<str!:address-of-base-image-the-service-uses:rabbitmq>
+RABBITMQ_BASE_IMAGE_TAG=<str!:version-of-base-image-the-service-uses:3.12-management>
+
+RABBITMQ_RESTART=<enum?:restart-policy:no|always|on-failure|unless-stopped>
+
+RABBITMQ_HC_INTERVAL=<str?:time-between-healthchecks:30s>
+RABBITMQ_HC_TIMEOUT=<str?:time-to-wait-for-healthy-response:10s>
+RABBITMQ_HC_RETRIES=<int?:number-of-attempts-to-get-healthy-response:3>
+RABBITMQ_HC_START_PERIOD=<str?:time-to-wait-before-starting-healthcheck:5s>
+
+RABBITMQ_IMAGE_USER_NAME=<str?:name-of-linux-user-inside-container:user>
+RABBITMQ_IMAGE_USER_ID=<int?:uid-of-linux-user-inside-container:1000>
+RABBITMQ_IMAGE_GROUP_NAME=<str?:name-of-linux-group-inside-container:user>
+RABBITMQ_IMAGE_GROUP_ID=<int?:gid-of-linux-group-inside-container:1000>

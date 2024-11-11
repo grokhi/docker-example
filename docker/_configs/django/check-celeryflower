@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# -----------------------------------------------------------------------------
+
+if curl -f http://0.0.0.0:5555/healthcheck; then
+    echo "Celery flower is healthy!"
+    exit 0
+else
+    echo "Celery flower is not healthy!"
+    exit 1
+fi

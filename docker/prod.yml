@@ -1,0 +1,46 @@
+services:
+
+  django: &django
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../.ssl:/etc/ssl:z
+    ports:
+      - "443:443"
+
+  celeryworker:
+    <<: *django
+    ports: [ ]
+
+  celerybeat:
+    <<: *django
+    ports: [ ]
+
+  celeryflower:
+    <<: *django
+    depends_on:
+      celeryworker:
+        condition: service_healthy
+    ports:
+      - "5555:5555"
+
+  postgres:
+    ports:
+      - "5432:5432"
+
+  mongo:
+    ports:
+      - "27017:27017"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    ports:
+      - "5672:5672"
